@@ -6,67 +6,89 @@
   <title>Surprise</title>
   <style>
     :root{
-      /* white + red palette */
       --bg: #ffffff;
       --panel: rgba(255,0,45,0.04);
-      --accent: #ff0045; /* vivid red */
+      --accent: #ff0045;
       --accent-2: #ff6f8f;
       --text: #0b0b0b;
       --muted: rgba(11,11,11,0.6);
     }
+
     html,body{height:100%;}
     body{
       margin:0;font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
       background: linear-gradient(180deg, var(--bg) 0%, #fffafc 100%);
       color:var(--text);display:flex;align-items:center;justify-content:center;overflow:hidden;
     }
+
     .wrap{width:100%;max-width:1100px;padding:40px;box-sizing:border-box;text-align:center}
 
-    .card{background:var(--panel);backdrop-filter: blur(10px);border-radius:20px;padding:36px;box-shadow:0 20px 60px rgba(0,0,0,0.08);transition:transform .8s cubic-bezier(.2,.9,.25,1),box-shadow .3s}
+    .card{background:var(--panel);backdrop-filter: blur(10px);border-radius:20px;padding:36px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.08);transition:transform .8s cubic-bezier(.2,.9,.25,1),box-shadow .3s}
     .card:hover{transform:translateY(-6px) scale(1.005);box-shadow:0 30px 90px rgba(0,0,0,0.12)}
 
     h1{font-size:clamp(28px,4vw,48px);margin:0 0 8px;font-weight:800;letter-spacing:-0.02em;color:var(--accent)}
     p.lead{margin:0 0 18px;color:var(--muted);font-weight:600}
 
     .countdown{display:flex;gap:18px;justify-content:center;align-items:stretch;flex-wrap:wrap}
-    .seg{min-width:90px;background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));padding:18px;border-radius:12px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 6px 18px rgba(11,11,11,0.04);transition:transform .25s ease, box-shadow .25s ease}
+    .seg{min-width:90px;background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+      padding:18px;border-radius:12px;border:1px solid rgba(0,0,0,0.04);box-shadow:0 6px 18px rgba(11,11,11,0.04);transition:transform .25s ease, box-shadow .25s ease}
     .seg:hover{transform:translateY(-6px);box-shadow:0 12px 28px rgba(11,11,11,0.06)}
     .seg .num{font-size:34px;font-weight:900;letter-spacing:-0.01em}
     .seg .lbl{font-size:12px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:0.12em}
 
-    /* Celebration mode */
-    .celebrate{position:relative;min-height:60vh;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:40px;opacity:0;transform:scale(.98);transition:opacity .9s ease, transform .9s ease}
+    .celebrate{position:relative;min-height:60vh;display:flex;align-items:center;justify-content:center;flex-direction:column;
+      padding:40px;opacity:0;transform:scale(.98);transition:opacity .9s ease, transform .9s ease}
     .celebrate.show{opacity:1;transform:scale(1)}
-    .celebrate h1{font-size:clamp(36px,6vw,96px);color:var(--accent);text-shadow:0 10px 40px rgba(255,0,69,0.12);margin:0}
+    .celebrate h1{font-size:clamp(36px,6vw,96px);color:var(--accent);
+      text-shadow:0 10px 40px rgba(255,0,69,0.12);margin:0}
+
+    /* floating hearts */
     .hearts{display:flex;gap:10px;margin-top:14px}
     .heart{font-size:32px;transform-origin:center;animation:float 1200ms ease-in-out infinite}
     .heart:nth-child(2){animation-delay:160ms}
     .heart:nth-child(3){animation-delay:320ms}
     @keyframes float{0%{transform:translateY(0) scale(.95)}50%{transform:translateY(-10px) scale(1.08)}100%{transform:translateY(0) scale(.98)}}
 
-    /* hearts */
-    .heart{position:absolute;bottom:-20%;width:52px;height:68px;border-radius:50% 50% 45% 45%;opacity:0.98;filter:drop-shadow(0 10px 18px rgba(0,0,0,0.08))}
-    .string{position:absolute;left:50%;width:2px;height:86px;background:linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.02));transform-origin:top}
+    /* treasure hint */
+    .treasure-hint{
+      margin-top:28px;
+      font-size:clamp(16px,2vw,22px);
+      font-weight:600;
+      color:var(--text);
+      opacity:0;
+      transform:translateY(20px);
+      transition:opacity 1.2s ease, transform 1.2s cubic-bezier(.2,.9,.25,1);
+      max-width:700px;
+      line-height:1.55;
+    }
+    .treasure-hint.show{
+      opacity:1;
+      transform:translateY(0);
+    }
 
-    /* confetti canvas */
     canvas#confetti{position:fixed;left:0;top:0;pointer-events:none;width:100%;height:100%;z-index:200}
 
     .footer{margin-top:26px;color:var(--muted);font-size:13px}
 
-    @media (max-width:520px){.seg{min-width:64px;padding:12px}.seg .num{font-size:22px}.countdown{gap:12px}}
+    @media (max-width:520px){
+      .seg{min-width:64px;padding:12px}
+      .seg .num{font-size:22px}
+      .countdown{gap:12px}
+    }
 
-    @keyframes rise{0%{transform:translateY(0)}100%{transform:translateY(-120vh)}}
-
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
 </head>
 <body>
-  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <canvas id="confetti"></canvas>
+
   <div class="wrap">
     <div id="mainCard" class="card" role="main">
+
       <h1 id="title">A small surprise...</h1>
 
-      <div id="countdownWrap" aria-live="polite">
+      <div id="countdownWrap">
         <div class="countdown" id="countdown">
           <div class="seg"><div class="num" id="days">--</div><div class="lbl">Days</div></div>
           <div class="seg"><div class="num" id="hours">--</div><div class="lbl">Hours</div></div>
@@ -76,126 +98,155 @@
       </div>
 
       <div id="celebrateArea" class="celebrate" aria-hidden="true">
-        <h1 id="celebrateTitle">HAPPY BIRTHDAY, MOM!</h1>
-        <div class="hearts" aria-hidden="true">
+        <h1>HAPPY BIRTHDAY, MOM!</h1>
+
+        <div class="hearts">
           <div class="heart">❤️</div>
           <div class="heart">❣️</div>
           <div class="heart">💗</div>
         </div>
+
+        <!-- ★★★ Added Shakespeare-style treasure hint ★★★ -->
+        <div id="treasureHint" class="treasure-hint">
+          “Behind the glass that knoweth thy face,<br>
+          a quiet wonder rests in wait.”
+        </div>
+
         <div class="footer">Made with love ❤️</div>
       </div>
+
     </div>
   </div>
 
   <script>
-
-    // -----------------------------
-    // REAL TARGET (Tomorrow at 12:00 AM)
-    // -----------------------------
-
-    function getTomorrowMidnight(){
-    const now = new Date();
-    const t = new Date();
-    t.setDate(now.getDate() + 1); // move to tomorrow
-    t.setHours(0,0,0,0);          // set time = 12:00 AM
-    return t;
+    // ----------------------------------------------------
+    // 🔥 TEST TARGET TIME — TODAY AT 8:30 PM
+    // ----------------------------------------------------
+    function getTestTime(){
+      const now = new Date();
+      const t = new Date();
+      t.setHours(0,0,0,0);  // 20:30 = 8:30 PM
+      if(t - now < 0){
+        t.setDate(t.getDate() + 1);
+      }
+      return t;
     }
 
-    // ====== REAL TARGET: tomorrow midnight ======
-    const target = getTomorrowMidnight();
-    // ====== END REAL TARGET ======
+    const target = getTestTime();
+    // ----------------------------------------------------
 
-
-    // Elements
     const daysEl = document.getElementById('days');
     const hoursEl = document.getElementById('hours');
     const minutesEl = document.getElementById('minutes');
     const secondsEl = document.getElementById('seconds');
-    const title = document.getElementById('title');
-    const subtitle = document.getElementById('subtitle');
     const countdownWrap = document.getElementById('countdownWrap');
     const celebrateArea = document.getElementById('celebrateArea');
+    const treasureHint = document.getElementById('treasureHint');
 
-    // nice padding for numbers
-    function pad(n){return String(n).padStart(2,'0');}
+    function pad(n){ return String(n).padStart(2,'0'); }
 
-    function updateCountdown() {
+    function updateCountdown(){
       const now = new Date();
       const diff = target - now;
-      if (diff <= 0) { showCelebration(); return; }
-      const s = Math.floor(diff / 1000);
-      const days = Math.floor(s / (3600*24));
-      const hours = Math.floor((s % (3600*24)) / 3600);
-      const minutes = Math.floor((s % 3600) / 60);
-      const seconds = s % 60;
-      daysEl.textContent = pad(days);
-      hoursEl.textContent = pad(hours);
-      minutesEl.textContent = pad(minutes);
-      secondsEl.textContent = pad(seconds);
+      if(diff <= 0){ showCelebration(); return; }
+      const s = Math.floor(diff/1000);
+      daysEl.textContent = pad(Math.floor(s/86400));
+      hoursEl.textContent = pad(Math.floor((s%86400)/3600));
+      minutesEl.textContent = pad(Math.floor((s%3600)/60));
+      secondsEl.textContent = pad(s%60);
     }
 
-    // Celebration switch
-    let celebrated = false;
+    let done = false;
     function showCelebration(){
-      if(celebrated) return; celebrated = true;
-      // hide countdown content smoothly
-      countdownWrap.style.transition = 'opacity .8s ease';
-      countdownWrap.style.opacity = '0';
-      setTimeout(()=>{countdownWrap.style.display='none'; title.style.display='none'; subtitle.style.display='none';},900);
+      if(done) return; done = true;
 
-      // show celebration
-      celebrateArea.classList.add('show');
-      celebrateArea.setAttribute('aria-hidden','false');
+      countdownWrap.style.opacity = "0";
+      countdownWrap.style.transition = "opacity .9s ease";
+      setTimeout(()=>{ countdownWrap.style.display="none"; },900);
 
-      // spawn visuals
-      spawnHearts(); startConfetti(); playChime();
+      celebrateArea.classList.add("show");
+      setTimeout(()=> treasureHint.classList.add("show"), 1000);
+
+      spawnHearts();
+      startConfetti();
     }
 
-    // -----------------------------
-    // Confetti: improved with arcs and easing
-    // -----------------------------
+    // Confetti (same as original)
     const canvas = document.getElementById('confetti');
     const ctx = canvas.getContext('2d');
-    function resize(){canvas.width = innerWidth * devicePixelRatio; canvas.height = innerHeight * devicePixelRatio; canvas.style.width = innerWidth + 'px'; canvas.style.height = innerHeight + 'px'; ctx.scale(devicePixelRatio, devicePixelRatio);} window.addEventListener('resize', resize); resize();
 
-    class ConfettiParticle{constructor(x,y,angle,vel,color){this.x=x;this.y=y;this.vx=Math.cos(angle)*vel;this.vy=Math.sin(angle)*vel;this.size=6+Math.random()*8;this.color=color;this.tilt=Math.random()*10;this.spin=(Math.random()-0.5)*0.2;this.life=200+Math.random()*120}
-      update(){this.vy += 0.12; this.x += this.vx; this.y += this.vy; this.tilt += this.spin; this.life--;}
-      draw(ctx){ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.tilt*0.02); ctx.fillStyle=this.color; ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size); ctx.restore();}
+    function resize(){
+      canvas.width = innerWidth * devicePixelRatio;
+      canvas.height = innerHeight * devicePixelRatio;
+      canvas.style.width = innerWidth + 'px';
+      canvas.style.height = innerHeight + 'px';
+      ctx.scale(devicePixelRatio, devicePixelRatio);
     }
-    const conf = [];
-    let confTicker = 0; let confRunning = false;
-    function startConfetti(){confRunning=true; confTicker=240; requestAnimationFrame(confettiLoop);} 
-    function confettiLoop(){ctx.clearRect(0,0,canvas.width/devicePixelRatio,canvas.height/devicePixelRatio);
-      if(confRunning && confTicker-->0){ for(let i=0;i<18;i++){ const x = Math.random()*innerWidth; const y = -10; const angle = (Math.random()*Math.PI/2)+(Math.PI/4); const vel = 3+Math.random()*6; const color = ['#ff0045','#ff6f8f','#ffb3c6','#ffffff','#ffdce6'][Math.floor(Math.random()*5)]; conf.push(new ConfettiParticle(x,y,angle,vel,color)); }}
-      for(let i=conf.length-1;i>=0;i--){conf[i].update(); conf[i].draw(ctx); if(conf[i].life<=0 || conf[i].y>innerHeight+40) conf.splice(i,1);} if(confRunning || conf.length) requestAnimationFrame(confettiLoop);
-    }
+    window.addEventListener('resize', resize);
+    resize();
 
-    // -----------------------------
-    // Hearts (CSS + JS spawn)
-    // -----------------------------
-    function spawnHearts(){ const colors=["#ff0045","#ff6f8f","#ffffff","#ffb3c6"]; for(let i=0;i<10;i++){ const el=document.createElement('div'); el.className='heart'; el.style.left=(4 + Math.random()*92)+'%'; el.style.width=(36+Math.random()*72)+'px'; el.style.height=(48+Math.random()*88)+'px'; el.style.background=colors[Math.floor(Math.random()*colors.length)]; el.style.border='2px solid rgba(0,0,0,0.03)'; el.style.zIndex=100 + Math.floor(Math.random()*40); el.innerHTML='<div class="string" style="top:62px;left:50%;transform:translateX(-50%)"></div>'; document.body.appendChild(el); const dur = 9000 + Math.random()*9000; el.animate([{transform:'translateY(0) rotate(-6deg)', opacity:1},{transform:`translateY(-${40+Math.random()*90}vh) rotate(10deg)`, opacity:0.98}],{duration:dur,iterations:Infinity,easing:'cubic-bezier(.2,.9,.25,1)'}); setTimeout(()=>{ // remove after long time to avoid DOM bloat
-            setTimeout(()=>{ if(el && el.remove) el.remove(); }, dur*3);
-        },1000);
-      }}
-
-    // -----------------------------
-    // Sound chime (refined envelope)
-    // -----------------------------
-    function playChime(){ try{ const ac = new (window.AudioContext||window.webkitAudioContext)(); const o = ac.createOscillator(); const g = ac.createGain(); o.type='sine'; o.frequency.value = 880; o.connect(g); g.connect(ac.destination); g.gain.value = 0.0001; o.start(); g.gain.linearRampToValueAtTime(0.16, ac.currentTime + 0.02); o.frequency.exponentialRampToValueAtTime(440, ac.currentTime + 1.2); g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 1.6); setTimeout(()=>{o.stop(); ac.close();},1600);}catch(e){}
+    class ConfettiParticle{
+      constructor(x,y,angle,vel,color){
+        this.x=x; this.y=y;
+        this.vx=Math.cos(angle)*vel;
+        this.vy=Math.sin(angle)*vel;
+        this.color=color;
+        this.life=200+Math.random()*120;
+        this.size=6+Math.random()*8;
+      }
+      update(){ this.vy+=0.12; this.x+=this.vx; this.y+=this.vy; this.life--; }
+      draw(ctx){ ctx.fillStyle=this.color; ctx.fillRect(this.x,this.y,this.size,this.size); }
     }
 
-    // Schedule show at exact target time (robust)
-    function scheduleTrigger(){ const now = new Date(); const diff = target - now; if(diff<=0){ showCelebration(); return;} if(diff>24*3600*1000){ setTimeout(scheduleTrigger, 12*3600*1000); } else { setTimeout(()=>{ showCelebration(); }, diff+30); }}
+    const confetti = [];
+    let confTicker = 0;
 
-    // initial
-    updateCountdown(); const updater = setInterval(updateCountdown,1000); scheduleTrigger();
+    function startConfetti(){
+      confTicker = 240;
+      requestAnimationFrame(loop);
+    }
 
-    // dev/testing: press T to force celebration
-    window.addEventListener('keydown',(e)=>{ if(e.key.toLowerCase()==='t'){ showCelebration(); } });
+    function loop(){
+      ctx.clearRect(0,0,innerWidth,innerHeight);
+      if(confTicker-- > 0){
+        for(let i=0;i<16;i++){
+          const x=Math.random()*innerWidth;
+          confetti.push(new ConfettiParticle(x,-10,
+            Math.random()*1+2,3+Math.random()*5,
+            ["#ff0045","#ff6f8f","#ffb3c6","#ffffff"][Math.floor(Math.random()*4)]
+          ));
+        }
+      }
+      confetti.forEach((p,i)=>{
+        p.update(); p.draw(ctx);
+        if(p.life<=0 || p.y>innerHeight) confetti.splice(i,1);
+      });
+      if(confetti.length || confTicker>0) requestAnimationFrame(loop);
+    }
 
-    // convenience: log target (dev)
-    console.log('Target (local):', target.toString());
+    function spawnHearts(){
+      const colors = ["#ff0045","#ff6f8f","#ffffff","#ffb3c6"];
+      for(let i=0;i<10;i++){
+        const el = document.createElement("div");
+        el.className="heart";
+        el.textContent="❤️";
+        el.style.position="absolute";
+        el.style.left=(5+Math.random()*90)+"%";
+        el.style.bottom="-10%";
+        el.style.fontSize=(26+Math.random()*20)+"px";
+        document.body.appendChild(el);
+
+        el.animate(
+          [{transform:"translateY(0)", opacity:1},
+           {transform:`translateY(-90vh)`, opacity:0.2}],
+          {duration:9000+Math.random()*4000, iterations:Infinity}
+        );
+      }
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown,1000);
+
   </script>
 </body>
 </html>
-
