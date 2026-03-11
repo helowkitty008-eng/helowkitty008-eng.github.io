@@ -191,7 +191,7 @@ function updateCountdown(){
 
   // message index changes at midnight SL time
   const base = new Date(2025,0,1); // Jan 1, 2025 reference
-  const daysSinceBase = Math.floor((sriLankaNow() - base)/MS_DAY);
+  const daysSinceBase = Math.floor((Date.now() - base)/MS_DAY);
   const idx = ((daysSinceBase % MESSAGES.length)+MESSAGES.length)%MESSAGES.length;
   document.getElementById('message').textContent = MESSAGES[idx];
 }
@@ -329,6 +329,7 @@ secretBtn.addEventListener('click',()=>{
 
   if(alt){
     msgEl.textContent = 'Psst... remember our first chat? ❤';
+    setTimeout(updateCountdown, 5000)
   } else {
     // refresh to normal daily message
     updateCountdown();
